@@ -25,15 +25,18 @@ def monitor(url):
                 title = data.get("title", "Grand Seiko Watch")
                 msg = f"{title} is in stock: {url}"
                 asyncio.run(send_txt(msg, subj))
+                return True
 
             else:
                 print(f"Info: {url} is not in stock.")
 
         else:
             print(f"Warning: {url} returned status code {response.status_code}.")
-
+        
+        return False
     except requests.exceptions.RequestException as e:
         print(f"Error: Could not reach {url}. Exception: {e}")
+        return False
 
 
 async def send_txt(msg, subj):
@@ -62,7 +65,8 @@ if __name__ == "__main__":
     # This script monitors a Grand Seiko watch availability and sends a text alert when it is in stock.
     url =  "https://grandseikoboutique.us/products/watch-spring-drive-boutique-limited-indigo-sbga469"
 
-    # run the monitor function every hour 
-    while True:
-        monitor(url)
+    # run the monitor function every hour until product is in stock
+    flag = False
+    while not flag:
+        flag = monitor(url)
         asyncio.run(asyncio.sleep(3600))
